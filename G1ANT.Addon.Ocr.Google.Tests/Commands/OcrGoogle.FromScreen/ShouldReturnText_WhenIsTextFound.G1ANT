@@ -1,0 +1,12 @@
+﻿addon iexplorer version 2.205.17304.1000
+addon ocrgoogle version 2.205.17304.1000
+
+process.kill iexplore
+ie.open http://digitalnativestudios.com/textmeshpro/docs/rich-text/lowercase-uppercase-smallcaps.png
+window ‴✱Internet Explorer✱‴ style maximize
+delay milliseconds 200
+ocrgoogle.login ♥credential⟦ocrgoogle:jsoncredential⟧
+ocrgoogle.fromscreen area ♥screen result ♥ocrResult
+ie.close
+
+test ⊂♥ocrResult.Contains("alice and bob watched tv")⊃

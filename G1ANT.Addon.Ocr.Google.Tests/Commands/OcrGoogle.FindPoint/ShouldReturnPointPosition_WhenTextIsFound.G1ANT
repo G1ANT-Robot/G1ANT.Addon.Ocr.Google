@@ -1,0 +1,13 @@
+﻿addon iexplorer version 2.205.17304.1000
+addon ocrgoogle version 2.205.17304.1000
+
+process.kill iexplore
+ie.open http://digitalnativestudios.com/textmeshpro/docs/rich-text/lowercase-uppercase-smallcaps.png
+window ‴✱Internet Explorer✱‴ style maximize
+delay milliseconds 200
+ocrgoogle.login ♥credential⟦ocrgoogle:jsoncredential⟧
+ocrgoogle.findpoint ‴alice‴ area ♥screen result ♥pointResult
+ie.close
+
+test ⊂♥pointResult⟦x⟧.GetType() == typeof(Int32) && ♥pointResult⟦x⟧ > 0⊃
+test ⊂♥pointResult⟦y⟧.GetType() == typeof(Int32) && ♥pointResult⟦y⟧ > 0⊃

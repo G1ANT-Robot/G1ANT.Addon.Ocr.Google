@@ -1,0 +1,46 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.26430.6
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "G1ANT.Addon.Ocr.Google", "G1ANT.Addon.Ocr.Google\G1ANT.Addon.Ocr.Google.csproj", "{3B1DC446-00EF-4DC1-AD42-41D76C3DE2A8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "G1ANT.Addon.Ocr.Google.Tests", "G1ANT.Addon.Ocr.Google.Tests\G1ANT.Addon.Ocr.Google.Tests.csproj", "{DC8C80D5-3786-46C0-8D10-7E4997182C12}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		AutomatedDebug|Any CPU = AutomatedDebug|Any CPU
+		Debug (.Net 4.0)|Any CPU = Debug (.Net 4.0)|Any CPU
+		Debug|Any CPU = Debug|Any CPU
+		Release (.Net 4.0)|Any CPU = Release (.Net 4.0)|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{3B1DC446-00EF-4DC1-AD42-41D76C3DE2A8}.AutomatedDebug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3B1DC446-00EF-4DC1-AD42-41D76C3DE2A8}.AutomatedDebug|Any CPU.Build.0 = Debug|Any CPU
+		{3B1DC446-00EF-4DC1-AD42-41D76C3DE2A8}.Debug (.Net 4.0)|Any CPU.ActiveCfg = Debug|Any CPU
+		{3B1DC446-00EF-4DC1-AD42-41D76C3DE2A8}.Debug (.Net 4.0)|Any CPU.Build.0 = Debug|Any CPU
+		{3B1DC446-00EF-4DC1-AD42-41D76C3DE2A8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3B1DC446-00EF-4DC1-AD42-41D76C3DE2A8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3B1DC446-00EF-4DC1-AD42-41D76C3DE2A8}.Release (.Net 4.0)|Any CPU.ActiveCfg = Release|Any CPU
+		{3B1DC446-00EF-4DC1-AD42-41D76C3DE2A8}.Release (.Net 4.0)|Any CPU.Build.0 = Release|Any CPU
+		{3B1DC446-00EF-4DC1-AD42-41D76C3DE2A8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3B1DC446-00EF-4DC1-AD42-41D76C3DE2A8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DC8C80D5-3786-46C0-8D10-7E4997182C12}.AutomatedDebug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DC8C80D5-3786-46C0-8D10-7E4997182C12}.AutomatedDebug|Any CPU.Build.0 = Debug|Any CPU
+		{DC8C80D5-3786-46C0-8D10-7E4997182C12}.Debug (.Net 4.0)|Any CPU.ActiveCfg = Debug|Any CPU
+		{DC8C80D5-3786-46C0-8D10-7E4997182C12}.Debug (.Net 4.0)|Any CPU.Build.0 = Debug|Any CPU
+		{DC8C80D5-3786-46C0-8D10-7E4997182C12}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DC8C80D5-3786-46C0-8D10-7E4997182C12}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DC8C80D5-3786-46C0-8D10-7E4997182C12}.Release (.Net 4.0)|Any CPU.ActiveCfg = Release|Any CPU
+		{DC8C80D5-3786-46C0-8D10-7E4997182C12}.Release (.Net 4.0)|Any CPU.Build.0 = Release|Any CPU
+		{DC8C80D5-3786-46C0-8D10-7E4997182C12}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DC8C80D5-3786-46C0-8D10-7E4997182C12}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {26D1A627-AA6A-444B-956E-FA70B6D3CAB1}
+	EndGlobalSection
+EndGlobal
