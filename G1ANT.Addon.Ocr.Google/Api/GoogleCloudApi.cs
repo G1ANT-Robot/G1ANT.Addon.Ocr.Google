@@ -12,150 +12,146 @@ using Google.Apis.Auth.OAuth2;
 using Google.Apis.Services;
 using Google.Apis.Vision.v1;
 using Google.Apis.Vision.v1.Data;
-using GoogleOCR = Google.Apis.Vision.v1.Data;
 using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.Drawing;
+using Image = Google.Apis.Vision.v1.Data.Image;
 
 namespace G1ANT.Language.Ocr.Google
 {
     public class GoogleCloudApi
     {
-        private static string _jsonCredential;
-        public static string JsonCredential
-        {
-            get
-            {
-                return _jsonCredential;
-            }
-            set
-            {
-                try
-                {
-                    _jsonCredential = value;
-                    googleCredential = CreateCredential(_jsonCredential);
-                }
-                catch
-                {
-                    googleCredential = null;
-                    _jsonCredential = null;
-                    throw new Exception("Invalid json credential. Cannot connect to the Google Cloud Service");
-                }
-            }
-        }
-        private static GoogleCredential googleCredential;
-
+        private static BaseClientService.Initializer initializer;
 
         public GoogleCloudApi()
         {
-            if (googleCredential == null)
-                throw new Exception("Before using this command, you need to login to Google Cloud Service. Please, use ocr.login command first");
+            if (initializer == null)
+                throw new Exception("Before using this command, you need to login to Google Cloud Service. Please, use ocrgoogle.login command first");
         }
 
-        private static GoogleCredential CreateCredential(string jsonCredential)
+        public static void LoginWithJson(string applicationName, string jsonCredential)
         {
-            using (var stream = jsonCredential.ConvertStringToStream())
+            try
             {
-                string[] scopes = { VisionService.Scope.CloudPlatform };
-                var credential = GoogleCredential.FromStream(stream);
-                return credential.CreateScoped(scopes);
+                using (var stream = jsonCredential.ConvertStringToStream())
+                {
+                    initializer = new BaseClientService.Initializer
+                    {
+                        ApplicationName = applicationName,
+                        HttpClientInitializer = GoogleCredential.FromStream(stream).CreateScoped(VisionService.Scope.CloudPlatform),
+                        GZipEnabled = true,
+                    };
+                }
+            }
+            catch
+            {
+                throw new Exception("Invalid json credential");
             }
         }
 
-        private VisionService CreateService()
+        public static void LoginWithApiKey(string applicationName, string apiKey)
         {
-            var service = new VisionService(new BaseClientService.Initializer()
+            initializer = new BaseClientService.Initializer
             {
-                HttpClientInitializer = googleCredential,
-                ApplicationName = "G1ANT-Robot",
+                ApplicationName = applicationName,
+                ApiKey = apiKey,
                 GZipEnabled = true,
-            });
-            return service;
+            };
+        }
+
+        public static void Logout()
+        {
+            initializer = null;
         }
 
         public string RecognizeText(Bitmap image, List<string> languages, int timeout)
         {
-            BatchAnnotateImagesRequest batchRequest = new BatchAnnotateImagesRequest();
-            batchRequest.Requests = new List<AnnotateImageRequest>();
-
-            batchRequest.Requests.Add(new AnnotateImageRequest()
+            try
             {
-
-                Features = new List<Feature>() { new Feature() { Type = "TEXT_DETECTION", MaxResults = 1 }, },
-                ImageContext = new ImageContext() { LanguageHints = languages },
-
-                Image = new GoogleOCR.Image()
-                { Content = Convert.ToBase64String(image.ImageToBytes()) },
-            });
-
-            string output = string.Empty;
-            using (var visioService = this.CreateService())
-            {
-                visioService.HttpClient.Timeout = new TimeSpan(0, 0, 0, 0, timeout);
-                var annotate = visioService.Images.Annotate(batchRequest);
-                BatchAnnotateImagesResponse batchAnnotateImagesResponse = annotate.Execute();
-                var annotations = batchAnnotateImagesResponse.Responses;
-                if (annotations.Count > 0 &&
-                    annotations[0].TextAnnotations != null &&
-                    annotations[0].TextAnnotations.Count > 0 &&
-                    annotations[0].TextAnnotations[0].Description != null)
+                return DoWithVisionService(image, languages, timeout, annotations =>
                 {
-                    output = annotations[0].TextAnnotations[0].Description.TrimEnd().TrimStart();
-                }
+                    return annotations.First().TextAnnotations.First().Description?.Trim();
+                });
             }
-            return output;
+            catch (Exception ex)
+            {
+                throw new Exception($"Could not recognize text. Message: {ex.Message}", ex);
+            }
         }
 
-        public Rectangle RecognizeText(Bitmap image, string searchword, List<string> languages, int timeout)
+        public Rectangle? FindTextPosition(Bitmap image, string searchWord, List<string> languages, int timeout)
         {
-            Rectangle rect = new Rectangle();
-            BatchAnnotateImagesRequest batchRequest = new BatchAnnotateImagesRequest();
-            batchRequest.Requests = new List<AnnotateImageRequest>();
-            batchRequest.Requests.Add(new AnnotateImageRequest()
+            try
             {
-                Features = new List<Feature>() { new Feature() { Type = "TEXT_DETECTION", MaxResults = 1 }, },
-                ImageContext = new ImageContext() { LanguageHints = languages },
-                Image = new GoogleOCR.Image() { Content = Convert.ToBase64String(image.ImageToBytes()) },
-            });
-
-            string output = string.Empty;
-            using (var visioService = this.CreateService())
-            {
-
-                visioService.HttpClient.Timeout = new TimeSpan(0, 0, 0, 0, timeout);
-                var annotate = visioService.Images.Annotate(batchRequest);
-                BatchAnnotateImagesResponse batchAnnotateImagesResponse = annotate.Execute();
-                var annotations = batchAnnotateImagesResponse.Responses;
-                if (annotations.Count > 0 &&
-                    annotations[0].TextAnnotations != null &&
-                    annotations[0].TextAnnotations.Count > 0 &&
-                    annotations[0].TextAnnotations[0].Description != null)
+                return DoWithVisionService(image, languages, timeout, annotations =>
                 {
-                    output = annotations[0].TextAnnotations[0].Description.TrimEnd().TrimStart();
+                    var rectangle = default(Rectangle?);
+                    var annotation = annotations.First().TextAnnotations.FirstOrDefault(a => string.Equals(a.Description, searchWord, StringComparison.InvariantCultureIgnoreCase));
+
+                    if (annotation != null)
+                        rectangle = GetBoundingRectangle(annotation.BoundingPoly);
+
+                    return rectangle;
+                });
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Could not find text position. Message: {ex.Message}", ex);
+            }
+            
+        }
+
+        private T DoWithVisionService<T>(Bitmap image, List<string> languages, int timeout, Func<IList<AnnotateImageResponse>, T> func)
+        {            
+            using (var visionService = new VisionService(initializer))
+            {
+                visionService.HttpClient.Timeout = TimeSpan.FromMilliseconds(timeout);
+
+                var result = default(T);
+                var batchRequest = GetBatchAnnotateImagesRequest(image, languages);
+                var annotations = visionService.Images.Annotate(batchRequest).Execute().Responses;
+
+                if (IsAnyTextAnnotatations(annotations))
+                {
+                    result = func.Invoke(annotations);
                 }
 
-                if (annotations.Count > 0 &&
-                    annotations[0].TextAnnotations != null &&
-                    annotations[0].TextAnnotations.Count > 0)
-                {
-                    for (int i = 0; i < annotations[0].TextAnnotations.Count; i++)
-                    {
-                        var itemDescription = annotations[0].TextAnnotations[i].Description.ToLower();
-                        var item = annotations[0].TextAnnotations[i].BoundingPoly.Vertices;
-                        if (itemDescription.Equals(searchword.ToLower()))
-                        {
-                            rect = new Rectangle(item[0].X.Value, item[0].Y.Value, item[1].X.Value - item[0].X.Value, item[2].Y.Value - item[1].Y.Value);
-                            break;
-                        }
-                        else
-                        {
+                return result;
+            }
+        }
 
-                            rect = new Rectangle(-1, -1, -1, -1);
-                        }
+        private BatchAnnotateImagesRequest GetBatchAnnotateImagesRequest(Bitmap image, List<string> languages)
+        {
+            return new BatchAnnotateImagesRequest
+            {
+                Requests = new List<AnnotateImageRequest>
+                {
+                    new AnnotateImageRequest()
+                    {
+                        Features = new List<Feature> { new Feature() { Type = "TEXT_DETECTION", MaxResults = 1 } },
+                        ImageContext = new ImageContext { LanguageHints = languages },
+                        Image = new Image { Content = Convert.ToBase64String(image.ImageToBytes()) },
                     }
                 }
-            }
-            return rect;
+            };
+        }
+
+        private bool IsAnyTextAnnotatations(IList<AnnotateImageResponse> annotations)
+        {
+            return annotations != null && 
+                annotations.Any() && 
+                annotations.First().TextAnnotations != null &&
+                annotations.First().TextAnnotations.Any();
+        }
+
+        private Rectangle GetBoundingRectangle(BoundingPoly boundingPoly)
+        {
+            return new Rectangle(
+                boundingPoly.Vertices[0].X.Value,
+                boundingPoly.Vertices[0].Y.Value,
+                boundingPoly.Vertices[1].X.Value - boundingPoly.Vertices[0].X.Value,
+                boundingPoly.Vertices[2].Y.Value - boundingPoly.Vertices[1].Y.Value);
         }
     }
 }
