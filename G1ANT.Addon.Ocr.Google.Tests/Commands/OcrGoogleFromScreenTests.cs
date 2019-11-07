@@ -58,7 +58,7 @@ namespace G1ANT.Addon.Ocr.Google.Tests
         [Test, Timeout(OcrGoogleTests.TestTimeout)]
         public void OcrTestGoogleApiTest()
         {
-            GoogleCloudApi.LoginWithJson("G1ANT-Robot", (string)scripter.Variables.GetVariable("credential").GetValue("Ocr:google").Object);
+            GoogleCloudApi.InitializeJsonCredential("G1ANT-Robot", (string)scripter.Variables.GetVariable("credential").GetValue("Ocr:google").Object);
             var bitmapWithTestText = Resources.testimage;
             var expectedRectangle = new Rectangle(167, 142, 192, 51);
             var languages = new List<string>() { "en" };

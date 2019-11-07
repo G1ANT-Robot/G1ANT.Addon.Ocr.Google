@@ -30,7 +30,7 @@ namespace G1ANT.Language.Ocr.Google
                 throw new Exception("Before using this command, you need to login to Google Cloud Service. Please, use ocrgoogle.login command first");
         }
 
-        public static void LoginWithJson(string applicationName, string jsonCredential)
+        public static void InitializeJsonCredential(string applicationName, string jsonCredential)
         {
             try
             {
@@ -50,7 +50,7 @@ namespace G1ANT.Language.Ocr.Google
             }
         }
 
-        public static void LoginWithApiKey(string applicationName, string apiKey)
+        public static void InitializeApiKeyCredential(string applicationName, string apiKey)
         {
             initializer = new BaseClientService.Initializer
             {
@@ -60,7 +60,7 @@ namespace G1ANT.Language.Ocr.Google
             };
         }
 
-        public static void Logout()
+        public static void ClearCredential()
         {
             initializer = null;
         }

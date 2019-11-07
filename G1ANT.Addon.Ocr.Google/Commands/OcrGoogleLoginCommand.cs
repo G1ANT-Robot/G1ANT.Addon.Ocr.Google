@@ -32,13 +32,13 @@ namespace G1ANT.Language.Ocr.Google
         public void Execute(Arguments arguments)
         {
             if (!string.IsNullOrEmpty(arguments.ApiKey?.Value))
-                GoogleCloudApi.LoginWithApiKey(arguments.ApplicationName.Value, arguments.ApiKey.Value);
+                GoogleCloudApi.InitializeApiKeyCredential(arguments.ApplicationName.Value, arguments.ApiKey.Value);
             else if (!string.IsNullOrEmpty(arguments.JsonCredential?.Value))
-                GoogleCloudApi.LoginWithJson(arguments.ApplicationName.Value, arguments.JsonCredential.Value);
+                GoogleCloudApi.InitializeJsonCredential(arguments.ApplicationName.Value, arguments.JsonCredential.Value);
             else
                 throw new ArgumentException($"You must provide {nameof(arguments.ApiKey)} or {nameof(arguments.JsonCredential)} argument to log in to the Google Cloud Service");
 
-            OnScriptEnd = () => GoogleCloudApi.Logout();
+            OnScriptEnd = () => GoogleCloudApi.ClearCredential();
         }
     }
 }
