@@ -69,7 +69,7 @@ namespace G1ANT.Language.Ocr.Google
         {
             try
             {
-                return DoWithVisionService(image, languages, timeout, annotations =>
+                return ActionWithVisionService(image, languages, timeout, annotations =>
                 {
                     return annotations.First().TextAnnotations.First().Description?.Trim();
                 });
@@ -84,7 +84,7 @@ namespace G1ANT.Language.Ocr.Google
         {
             try
             {
-                return DoWithVisionService(image, languages, timeout, annotations =>
+                return ActionWithVisionService(image, languages, timeout, annotations =>
                 {
                     var rectangle = default(Rectangle?);
                     var annotation = annotations.First().TextAnnotations.FirstOrDefault(a => string.Equals(a.Description, searchWord, StringComparison.InvariantCultureIgnoreCase));
@@ -102,7 +102,7 @@ namespace G1ANT.Language.Ocr.Google
             
         }
 
-        private T DoWithVisionService<T>(Bitmap image, List<string> languages, int timeout, Func<IList<AnnotateImageResponse>, T> func)
+        private T ActionWithVisionService<T>(Bitmap image, List<string> languages, int timeout, Func<IList<AnnotateImageResponse>, T> func)
         {            
             using (var visionService = new VisionService(initializer))
             {
