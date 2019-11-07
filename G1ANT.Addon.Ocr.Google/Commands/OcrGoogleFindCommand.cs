@@ -9,15 +9,13 @@
 */
 
 using System;
-using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
+using System.Windows.Forms;
 
 namespace G1ANT.Language.Ocr.Google
 {
-    [Command(Name = "ocrgoogle.find",
-        Tooltip = "This command finds a specified text on the active screen and returns its position in a rectangle format")]
-
+    [Command(Name = "ocrgoogle.find", Tooltip = "This command finds a specified text on the active screen and returns its position in a rectangle format")]
     public class OcrGoogleFindCommand : Command
     {
         public class Arguments : CommandArguments
@@ -26,7 +24,7 @@ namespace G1ANT.Language.Ocr.Google
             public TextStructure Search { get; set; }
 
             [Argument(Tooltip = "Area on the screen to find text in, specified in `x0⫽y0⫽x1⫽y1` format, where `x0⫽y0` are the coordinates of the top left and `x1⫽y1` are the coordinates of the right bottom corner of the area")]
-            public RectangleStructure Area { get; set; } = new RectangleStructure(System.Windows.Forms.Screen.PrimaryScreen.Bounds);
+            public RectangleStructure Area { get; set; } = new RectangleStructure(SystemInformation.VirtualScreen);
 
             [Argument(Tooltip = "Determines whether the `area` argument is specified with absolute coordinates (top left corner of the screen) or refers to the currently opened window (its top left corner)")]
             public BooleanStructure Relative { get; set; } = new BooleanStructure(true);
@@ -41,22 +39,22 @@ namespace G1ANT.Language.Ocr.Google
             public TextStructure Languages { get; set; } = new TextStructure("en");
         }
 
-        public OcrGoogleFindCommand(AbstractScripter scripter) : base(scripter)
-        {
-        }
+        public OcrGoogleFindCommand(AbstractScripter scripter) : base(scripter) { }
 
         public void Execute(Arguments arguments)
         {
-            Rectangle rectangle = !arguments.Relative.Value ? arguments.Area.Value : arguments.Area.Value.ToAbsoluteCoordinates(); 
-            Bitmap partOfScreen = RobotWin32.GetPartOfScreen(rectangle);
-            int timeout = (int)arguments.Timeout.Value.TotalMilliseconds;
-            List<string> languages = arguments.Languages.Value.Split(',').ToList();
-            string search = arguments.Search.Value;
-            GoogleCloudApi googleApi = new GoogleCloudApi();
-            Rectangle output = googleApi.RecognizeText(partOfScreen, search, languages, timeout);
-            if (Equals(output, new Rectangle(-1, -1, -1, -1)))
-                throw new NullReferenceException("Ocr was unable to find text");
-            Scripter.Variables.SetVariableValue(arguments.Result.Value, new RectangleStructure(output));
+            var screenArea = !arguments.Relative.Value ? arguments.Area.Value : arguments.Area.Value.ToAbsoluteCoordinates(); 
+            var screenImage = RobotWin32.GetPartOfScreen(screenArea);
+            var timeout = (int)arguments.Timeout.Value.TotalMilliseconds;
+            var languages = arguments.Languages.Value.Split(',').ToList();
+            var search = arguments.Search.Value;
+            var googleApi = new GoogleCloudApi();
+            var rectangle = googleApi.FindTextPosition(screenImage, search, languages, timeout);
+
+            if (rectangle == null)
+                throw new NullReferenceException("Ocr was unable to find text position");
+
+            Scripter.Variables.SetVariableValue(arguments.Result.Value, new RectangleStructure(rectangle.Value));
         }
     }
 }

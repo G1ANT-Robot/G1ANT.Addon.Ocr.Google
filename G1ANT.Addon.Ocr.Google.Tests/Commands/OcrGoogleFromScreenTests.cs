@@ -47,7 +47,7 @@ namespace G1ANT.Addon.Ocr.Google.Tests
         {
             string expectedString = "animal";
             string script = $@"window {SpecialChars.Text + SpecialChars.Search}Paint{SpecialChars.Text + SpecialChars.Search} style maximize
-                            ocrgoogle.login {SpecialChars.Variable}credential{SpecialChars.IndexBegin}Ocr:google{SpecialChars.IndexEnd}
+                            ocrgoogle.login applicationname G1ANT-Robot jsoncredential {SpecialChars.Variable}credential{SpecialChars.IndexBegin}Ocr:google{SpecialChars.IndexEnd}
                             ocrgoogle.fromscreen area (rectangle)68{SpecialChars.Point}162{SpecialChars.Point}767{SpecialChars.Point}528";
             scripter.Text = script;
             scripter.Run();
@@ -58,13 +58,13 @@ namespace G1ANT.Addon.Ocr.Google.Tests
         [Test, Timeout(OcrGoogleTests.TestTimeout)]
         public void OcrTestGoogleApiTest()
         {
-            GoogleCloudApi.JsonCredential = (string)scripter.Variables.GetVariable("credential").GetValue("Ocr:google").Object;
+            GoogleCloudApi.InitializeJsonCredential("G1ANT-Robot", (string)scripter.Variables.GetVariable("credential").GetValue("Ocr:google").Object);
             var bitmapWithTestText = Resources.testimage;
             var expectedRectangle = new Rectangle(167, 142, 192, 51);
             var languages = new List<string>() { "en" };
             var timeout = 10000;
-            GoogleCloudApi googleApi = new GoogleCloudApi();
-            Rectangle foundRectangle = googleApi.RecognizeText(bitmapWithTestText, "animal", languages, timeout);
+            var googleApi = new GoogleCloudApi();
+            var foundRectangle = googleApi.FindTextPosition(bitmapWithTestText, "animal", languages, timeout);
             Assert.AreEqual(expectedRectangle, foundRectangle);
         }
 
