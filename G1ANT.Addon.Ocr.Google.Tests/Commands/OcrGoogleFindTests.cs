@@ -36,7 +36,7 @@ namespace G1ANT.Addon.Ocr.Google.Tests
             Language.Addon addon = Language.Addon.Load(@"G1ANT.Addon.Ocr.Google.dll");
             path = Assembly.GetExecutingAssembly().UnpackResourceToFile("Resources." + nameof(Resources.testimage), "png");
             scripter = new Scripter();
-scripter.InitVariables.Clear();
+            scripter.InitVariables.Clear();
             OcrGoogleTests.StartPaint(path);
         }
 
@@ -46,9 +46,8 @@ scripter.InitVariables.Clear();
             Rectangle expectedRectangle = new Rectangle(64, 102, 191, 51);
             string script = $@"
             window {SpecialChars.Text + SpecialChars.Search}Paint{SpecialChars.Text + SpecialChars.Search} style maximize
-            ocrgoogle.login {SpecialChars.Variable}credential{SpecialChars.IndexBegin}Ocr:google{SpecialChars.IndexEnd}
-            ocrgoogle.find search {SpecialChars.Text}animal{SpecialChars.Text} area (rectangle)110{SpecialChars.Point}184{SpecialChars.Point}564{SpecialChars.Point}488
-            ";
+            ocrgoogle.login applicationname G1ANT-Robot jsoncredential {SpecialChars.Variable}credential{SpecialChars.IndexBegin}Ocr:google{SpecialChars.IndexEnd}
+            ocrgoogle.find search {SpecialChars.Text}animal{SpecialChars.Text} area (rectangle)110{SpecialChars.Point}184{SpecialChars.Point}564{SpecialChars.Point}488";
             scripter.Text = script;
             scripter.Run();
             var resultRectangle = scripter.Variables.GetVariableValue<Rectangle>("result");

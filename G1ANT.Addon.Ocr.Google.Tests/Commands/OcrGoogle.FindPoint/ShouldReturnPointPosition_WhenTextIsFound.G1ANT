@@ -5,8 +5,8 @@ process.kill iexplore
 ie.open http://digitalnativestudios.com/textmeshpro/docs/rich-text/lowercase-uppercase-smallcaps.png
 window ‴✱Internet Explorer✱‴ style maximize
 delay milliseconds 200
-ocrgoogle.login ♥credential⟦ocrgoogle:jsoncredential⟧
-ocrgoogle.findpoint ‴alice‴ area ♥screen result ♥pointResult
+ocrgoogle.login applicationname ♥credential⟦ocrgoogle:applicationanme⟧ jsoncredential ♥credential⟦ocrgoogle:jsoncredential⟧
+ocrgoogle.findpoint ‴alice‴ result ♥pointResult relative false
 ie.close
 
 test ⊂♥pointResult⟦x⟧.GetType() == typeof(Int32) && ♥pointResult⟦x⟧ > 0⊃

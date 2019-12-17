@@ -5,8 +5,8 @@ process.kill iexplore
 ie.open http://digitalnativestudios.com/textmeshpro/docs/rich-text/lowercase-uppercase-smallcaps.png
 window ‴✱Internet Explorer✱‴ style maximize
 delay milliseconds 200
-ocrgoogle.login ♥credential⟦ocrgoogle:jsoncredential⟧
-ocrgoogle.fromscreen area ♥screen result ♥ocrResult
+ocrgoogle.login applicationname ♥credential⟦ocrgoogle:applicationanme⟧ jsoncredential ♥credential⟦ocrgoogle:jsoncredential⟧
+ocrgoogle.fromscreen result ♥ocrResult relative false
 ie.close
 
 test ⊂♥ocrResult.Contains("alice and bob watched tv")⊃
